@@ -51,13 +51,13 @@ class DraggableView extends Component<DraggableViewProps, DraggableViewState> {
     this.handleSizeChange = this.handleSizeChange.bind(this);
 
     this.panResponder = PanResponder.create({
-      onStartShouldSetPanResponder: (e, gestureState) => {
+      onStartShouldSetPanResponder: (_, gestureState) => {
         if (this.props.shouldStartDrag) {
           return Math.abs(gestureState.dx) > 5 || Math.abs(gestureState.dy) > 5;
         }
         return false;
       },
-      onMoveShouldSetPanResponder: (e, gestureState) => {
+      onMoveShouldSetPanResponder: (_, gestureState) => {
         if (this.props.shouldStartDrag) {
           return Math.abs(gestureState.dx) > 5 || Math.abs(gestureState.dy) > 5;
         }
@@ -66,7 +66,7 @@ class DraggableView extends Component<DraggableViewProps, DraggableViewState> {
       onPanResponderGrant: () => {
         this.setState({ isDragging: true });
       },
-      onPanResponderMove: (e, gestureState) => {
+      onPanResponderMove: (_, gestureState) => {
         if (this.state.isDragging) {
           const { previousOffsetX, previousOffsetY, tempW, tempH } = this.state;
           const newOffsetX = previousOffsetX + gestureState.dx;

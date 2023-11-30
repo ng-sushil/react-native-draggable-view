@@ -1,7 +1,7 @@
 {
   "name": "@ngenux/react-native-draggable-view",
-  "version": "0.1.2",
-  "description": "React Native component for enabling drag-and-drop functionality within mobile apps. ",
+  "version": "0.1.3",
+  "description": "React Native component for enabling drag functionality within mobile apps. ",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
   "types": "lib/typescript/src/index.d.ts",
@@ -49,7 +49,7 @@
     "native-component",
     "user-interface",
     "customizable"
-  ],  
+  ],
   "repository": "https://github.com/ng-sushil/react-native-draggable-view",
   "author": "ng-sushil <sushil.shinde@ngenux.com> (https://github.com/ng-sushil)",
   "license": "MIT",

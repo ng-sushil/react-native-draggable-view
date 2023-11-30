@@ -37,8 +37,19 @@
   "keywords": [
     "react-native",
     "ios",
-    "android"
-  ],
+    "android",
+    "draggable",
+    "drag-and-drop",
+    "touch",
+    "gesture",
+    "ui-component",
+    "interactive",
+    "mobile-ui",
+    "typescript",
+    "native-component",
+    "user-interface",
+    "customizable"
+  ],  
   "repository": "https://github.com/ng-sushil/react-native-draggable-view",
   "author": "ng-sushil <sushil.shinde@ngenux.com> (https://github.com/ng-sushil)",
   "license": "MIT",

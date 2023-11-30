@@ -1,31 +1,31 @@
-import * as React from 'react';
+import React from 'react';
+import { View, Text } from 'react-native';
+import Draggable from '@ngenux/react-native-draggable-view';
 
-import { StyleSheet, View, Text } from 'react-native';
-import { multiply } from '@ngenux/react-native-draggable-view';
-
-export default function App() {
-  const [result, setResult] = React.useState<number | undefined>();
-
-  React.useEffect(() => {
-    multiply(3, 7).then(setResult);
-  }, []);
-
+const App = () => {
   return (
-    <View style={styles.container}>
-      <Text>Result: {result}</Text>
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Draggable
+        edgeSpacing={0}
+        childrenWidth={100}
+        childrenHeight={50}
+        viewStyle={{ backgroundColor: 'blue' }}
+        shouldStartDrag={true}
+      >
+        <View
+          style={{
+            width: 100,
+            height: 50,
+            backgroundColor: 'red',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Text style={{ color: 'white', textAlign: 'center' }}>Drag Me!</Text>
+        </View>
+      </Draggable>
     </View>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  box: {
-    width: 60,
-    height: 60,
-    marginVertical: 20,
-  },
-});
+export default App;

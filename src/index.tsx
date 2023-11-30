@@ -1,3 +1,3 @@
-import DraggableView from './lib';
+import DraggableView from './Draggable';
 
 export default DraggableView;

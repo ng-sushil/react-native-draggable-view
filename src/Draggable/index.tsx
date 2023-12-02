@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Dimensions, PanResponder, View } from 'react-native';
-import type { ViewStyle,PanResponderInstance } from 'react-native';
+import type { PanResponderInstance, ViewStyle } from 'react-native';
+import { PanResponder, View } from 'react-native';
 
 interface DraggableViewProps {
   edgeSpacing?: number;
@@ -10,6 +10,9 @@ interface DraggableViewProps {
   viewStyle?: ViewStyle;
   initialOffsetX?: number;
   initialOffsetY?: number;
+  orientation: string;
+  width?: number;
+  height?: number;
 }
 
 interface DraggableViewState {
@@ -22,8 +25,6 @@ interface DraggableViewState {
   tempH: number;
 }
 
-const { width, height } = Dimensions.get('window');
-
 class DraggableView extends Component<DraggableViewProps, DraggableViewState> {
   private defaultEdgeSpacing: number;
   private defaultChildrenWidth: number;
@@ -35,8 +36,8 @@ class DraggableView extends Component<DraggableViewProps, DraggableViewState> {
     const initialOffsetX = 0;
     const initialOffsetY = 0;
     this.defaultEdgeSpacing = this.props.edgeSpacing || 10;
-    this.defaultChildrenWidth = this.props.childrenWidth || 180;
-    this.defaultChildrenHeight = this.props.childrenHeight || 148;
+    this.defaultChildrenWidth = this.props.childrenWidth || 150;
+    this.defaultChildrenHeight = this.props.childrenHeight || 100;
 
     this.state = {
       isDragging: false,
@@ -44,8 +45,8 @@ class DraggableView extends Component<DraggableViewProps, DraggableViewState> {
       offsetY: initialOffsetY,
       previousOffsetX: initialOffsetX,
       previousOffsetY: initialOffsetY,
-      tempW: width,
-      tempH: height,
+      tempW: this.props.width || 360,
+      tempH: this.props.height || 750,
     };
 
     this.handleSizeChange = this.handleSizeChange.bind(this);
@@ -72,11 +73,19 @@ class DraggableView extends Component<DraggableViewProps, DraggableViewState> {
           const newOffsetX = previousOffsetX + gestureState.dx;
           const newOffsetY = previousOffsetY + gestureState.dy;
 
-          const maxX = tempW - this.defaultChildrenWidth - this.defaultEdgeSpacing;
-          const maxY = tempH - this.defaultChildrenHeight - this.defaultEdgeSpacing;
+          const maxX = tempW - this.defaultEdgeSpacing;
+          const maxY = tempH - this.defaultEdgeSpacing;
 
-          const boundedOffsetX = Math.max(this.defaultEdgeSpacing, Math.min(newOffsetX, maxX));
-          const boundedOffsetY = Math.max(this.defaultEdgeSpacing, Math.min(newOffsetY, maxY));
+          const boundedOffsetX = this.calculateBoundedOffset(
+            newOffsetX,
+            maxX,
+            this.defaultEdgeSpacing
+          );
+          const boundedOffsetY = this.calculateBoundedOffset(
+            newOffsetY,
+            maxY,
+            this.defaultEdgeSpacing
+          );
 
           this.setState({
             offsetX: boundedOffsetX,
@@ -97,8 +106,9 @@ class DraggableView extends Component<DraggableViewProps, DraggableViewState> {
     });
   }
 
-  handleSizeChange(e: any) {
-    const { width, height } = e.window;
+  handleSizeChange() {
+    let width = this.props.width || 360;
+    let height = this.props.height || 750;
     const { offsetX, offsetY, tempW, tempH } = this.state;
 
     const widthRatio = tempW ? width / tempW : 0;
@@ -110,26 +120,33 @@ class DraggableView extends Component<DraggableViewProps, DraggableViewState> {
     const maxX = width - this.defaultChildrenWidth - this.defaultEdgeSpacing;
     const maxY = height - this.defaultChildrenHeight - this.defaultEdgeSpacing;
 
-    const boundedOffsetX = !isNaN(newOffsetX)
-      ? Math.max(this.defaultEdgeSpacing, Math.min(newOffsetX, maxX))
-      : this.defaultEdgeSpacing;
-    const boundedOffsetY = !isNaN(newOffsetY)
-      ? Math.max(this.defaultEdgeSpacing, Math.min(newOffsetY, maxY))
-      : this.defaultEdgeSpacing;
+    const boundedOffsetX = this.calculateBoundedOffset(
+      newOffsetX,
+      maxX,
+      this.defaultEdgeSpacing
+    );
+    const boundedOffsetY = this.calculateBoundedOffset(
+      newOffsetY,
+      maxY,
+      this.defaultEdgeSpacing
+    );
 
     this.setState({
-      tempW: width,
-      tempH: height,
       offsetX: boundedOffsetX,
       offsetY: boundedOffsetY,
-      previousOffsetX: boundedOffsetX,
-      previousOffsetY: boundedOffsetY,
+      previousOffsetX: offsetX,
+      previousOffsetY: offsetY,
     });
   }
 
   componentDidUpdate(prevProps: DraggableViewProps) {
-    Dimensions.addEventListener('change', this.handleSizeChange);
-
+    if (
+      prevProps.orientation !== this.props.orientation ||
+      prevProps.width !== this.props.width ||
+      prevProps.height !== this.props.height
+    ) {
+      this.handleSizeChange();
+    }
     if (prevProps.shouldStartDrag !== this.props.shouldStartDrag) {
       const tempX = 0;
       const tempY = 0;
@@ -141,6 +158,15 @@ class DraggableView extends Component<DraggableViewProps, DraggableViewState> {
         previousOffsetY: tempY,
       });
     }
+  }
+
+  calculateBoundedOffset(
+    offset: number,
+    maxOffset: number,
+    edgeSpacing: number
+  ) {
+    const boundedOffset = Math.max(edgeSpacing, Math.min(offset, maxOffset));
+    return boundedOffset;
   }
 
   resetPosition = () => {
@@ -157,29 +183,48 @@ class DraggableView extends Component<DraggableViewProps, DraggableViewState> {
 
   render() {
     const { offsetX, offsetY } = this.state;
-    const { viewStyle, shouldStartDrag, childrenWidth, childrenHeight } = this.props;
+    const {
+      viewStyle,
+      shouldStartDrag,
+      childrenWidth,
+      childrenHeight,
+      children,
+    } = this.props;
 
-    const safeChildrenWidth = childrenWidth || 180;
-    const safeChildrenHeight = childrenHeight || 148;
+    const safeChildrenWidth = childrenWidth || 150;
+    const safeChildrenHeight = childrenHeight || 120;
 
-    const maxX = this.state.tempW - safeChildrenWidth;
-    const maxY = this.state.tempH - safeChildrenHeight;
+    const maxX = this.state.tempW - safeChildrenWidth - this.defaultEdgeSpacing;
+    const maxY =
+      this.state.tempH - safeChildrenHeight - this.defaultEdgeSpacing;
 
-    const boundedOffsetX = Math.max(0, Math.min(offsetX, maxX));
-    const boundedOffsetY = Math.max(0, Math.min(offsetY, maxY));
+    const boundedOffsetX = this.calculateBoundedOffset(
+      offsetX,
+      maxX,
+      this.defaultEdgeSpacing
+    );
+    const boundedOffsetY = this.calculateBoundedOffset(
+      offsetY,
+      maxY,
+      this.defaultEdgeSpacing
+    );
 
     return (
       <View
         {...this.panResponder.panHandlers}
-        style={{
-          position: 'absolute',
-          top: boundedOffsetY,
-          left: boundedOffsetX,
-          ...(shouldStartDrag && { zIndex: 9999 }),
-          ...viewStyle,
-        }}
+        style={[
+          {
+            position: 'absolute',
+            top: boundedOffsetY,
+            left: boundedOffsetX,
+            ...(shouldStartDrag && { zIndex: 9999 }),
+            ...viewStyle,
+            backgroundColor: 'green',
+            borderWidth: 2,
+          },
+        ]}
       >
-        {this.props.children}
+        {children}
       </View>
     );
   }

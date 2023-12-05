@@ -1,6 +1,6 @@
 {
   "name": "@ngenux/react-native-draggable-view",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "React Native component for enabling drag functionality within mobile apps. ",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",

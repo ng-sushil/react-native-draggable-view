@@ -219,8 +219,6 @@ class DraggableView extends Component<DraggableViewProps, DraggableViewState> {
             left: boundedOffsetX,
             ...(shouldStartDrag && { zIndex: 9999 }),
             ...viewStyle,
-            backgroundColor: 'green',
-            borderWidth: 2,
           },
         ]}
       >
